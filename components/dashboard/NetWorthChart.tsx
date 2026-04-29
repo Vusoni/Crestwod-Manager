@@ -125,14 +125,16 @@ export function NetWorthChart() {
   }, [loaded, progress, theme.motion.pageEnter]);
 
   const animatedLineProps = useAnimatedProps(() => {
-    const dashOffset = geom.pathLength * (1 - progress.value);
+    'worklet';
     return {
-      strokeDasharray: [geom.pathLength, geom.pathLength],
-      strokeDashoffset: dashOffset,
+      strokeDashoffset: geom.pathLength * (1 - progress.value),
     };
   });
 
-  const animatedFillProps = useAnimatedProps(() => ({ opacity: progress.value }));
+  const animatedFillProps = useAnimatedProps(() => {
+    'worklet';
+    return { opacity: progress.value };
+  });
 
   const last = snapshots[snapshots.length - 1];
   const first = snapshots[0];
@@ -177,6 +179,7 @@ export function NetWorthChart() {
             strokeWidth={2.5}
             strokeLinecap="round"
             strokeLinejoin="round"
+            strokeDasharray={[geom.pathLength, geom.pathLength]}
             animatedProps={animatedLineProps}
           />
           <Circle

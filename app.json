@@ -7,7 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -22,7 +21,6 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A0A12"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.crestwod.manager"
     },
@@ -33,6 +31,7 @@
     "plugins": [
       "expo-router",
       "expo-web-browser",
+      "expo-font",
       [
         "expo-image-picker",
         {

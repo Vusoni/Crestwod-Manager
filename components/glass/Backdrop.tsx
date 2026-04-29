@@ -5,7 +5,7 @@ import { useTheme } from '@/theme/ThemeProvider';
 export function Backdrop() {
   const theme = useTheme();
   return (
-    <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: theme.colors.bg }]}>
+    <View style={[StyleSheet.absoluteFill, styles.noTouch, { backgroundColor: theme.colors.bg }]}>
       <LinearGradient
         colors={[
           theme.colors.backdropGradientTop,
@@ -24,3 +24,9 @@ export function Backdrop() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  noTouch: {
+    pointerEvents: 'none',
+  },
+});

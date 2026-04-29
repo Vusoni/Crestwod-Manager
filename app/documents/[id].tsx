@@ -17,10 +17,21 @@ export default function DocumentDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { getDocumentById, investorMode, updateDocument } = useDocuments();
+  const { getDocumentById, investorMode, updateDocument, loaded } = useDocuments();
   const { businesses } = useNetWorth();
 
   const document = id ? getDocumentById(id) : undefined;
+
+  if (!loaded) {
+    return (
+      <View style={[styles.center, { paddingTop: insets.top + 40 }]}>
+        <Backdrop />
+        <Text style={[theme.typography.bodySmall, { color: theme.colors.textFaint }]}>
+          Loading…
+        </Text>
+      </View>
+    );
+  }
 
   if (!document) {
     return (

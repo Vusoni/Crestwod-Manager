@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import Animated, {
   Easing,
-  interpolate,
   useAnimatedProps,
   useSharedValue,
   withTiming,
@@ -18,6 +17,13 @@ import type { Currency } from '@/types/netWorth';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
+const CURRENCY_SYMBOL: Record<Currency, string> = {
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  PLN: 'zł',
+};
+
 interface Props {
   currency?: Currency;
 }
@@ -26,23 +32,32 @@ export function HeroNetWorth({ currency = 'USD' }: Props) {
   const theme = useTheme();
   const { netWorth, netWorthDelta, netWorthDeltaPct, loaded } = useNetWorth();
 
-  const progress = useSharedValue(0);
+  const display = useSharedValue(0);
 
   useEffect(() => {
-    if (loaded) {
-      progress.value = 0;
-      progress.value = withTiming(1, {
-        duration: theme.motion.slow,
-        easing: Easing.out(Easing.cubic),
-      });
-    }
-  }, [loaded, netWorth, progress, theme.motion.slow]);
+    if (!loaded) return;
+    display.value = withTiming(netWorth, {
+      duration: theme.motion.slow,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [loaded, netWorth, display, theme.motion.slow]);
+
+  const symbol = CURRENCY_SYMBOL[currency];
 
   const animatedProps = useAnimatedProps(() => {
-    const animated = interpolate(progress.value, [0, 1], [0, netWorth]);
+    'worklet';
+    const animated = Math.round(display.value);
+    const abs = Math.abs(animated);
+    const sign = animated < 0 ? '-' : '';
+    const digits = String(abs);
+    let withCommas = '';
+    for (let i = 0; i < digits.length; i += 1) {
+      if (i > 0 && (digits.length - i) % 3 === 0) withCommas += ',';
+      withCommas += digits[i];
+    }
     return {
-      text: formatCurrency(Math.round(animated), currency),
-      defaultValue: formatCurrency(0, currency),
+      text: `${sign}${symbol}${withCommas}`,
+      defaultValue: `${symbol}0`,
     } as { text: string; defaultValue: string };
   });
 
@@ -59,12 +74,13 @@ export function HeroNetWorth({ currency = 'USD' }: Props) {
       <MaskedView
         style={styles.maskWrap}
         maskElement={
-          <View style={styles.maskInner}>
+          <View style={styles.maskInner} pointerEvents="none">
             <AnimatedTextInput
               animatedProps={animatedProps}
               editable={false}
               allowFontScaling={false}
               underlineColorAndroid="transparent"
+              pointerEvents="none"
               style={[theme.typography.hero, styles.heroText, { color: theme.colors.text }]}
             />
           </View>
@@ -120,7 +136,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   maskInner: {
-    backgroundColor: 'transparent',
     flex: 1,
   },
   heroText: {
